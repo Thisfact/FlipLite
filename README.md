@@ -9,7 +9,7 @@ A browser-based, frame-by-frame animation tool inspired by Flipnote. It runs ent
 
 * **Canvas:** Max 500×400 resolution, can be changed in the settings.
 * **Workflow:** 2 drawing layers, 1 background layer, and onion skinning.
-* **Tools:** Dither brush, dither fill, shapes, text, selection/transform tools and mirror modes.
+* **Tools:** Dither brush, dither fill, shapes, text, selection/transform, motion path tool and mirror modes.
 * **Timing:** Fixed FPS or variable per-frame timing.
 * **Export:** Save as GIF or per-frame PNG sequences.
 * **Storage:** Save projects locally as `.flip` files.
