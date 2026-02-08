@@ -1,4 +1,5 @@
 # FlipLite
+*Just so you know, this project was helped by AI coding, rough estimate, 40% is coded by me and the rest is coded via various coding LLMs.*
 
 A browser-based, frame-by-frame animation tool inspired by Flipnote. It runs entirely locally in your browser with no accounts, no cloud saving, and no setup.
 
