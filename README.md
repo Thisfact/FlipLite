@@ -1,3 +1,6 @@
+
+<img width="1440" height="816" alt="FlipLite v1.5.1w screenshot" src="https://github.com/user-attachments/assets/4f837d0e-b460-4913-ba7b-697ad5a825ce" />
+
 # FlipLite
 *Just so you know, this project was helped by AI coding, rough estimate, 40% is coded by me and the rest is coded via various coding LLMs.*
 
