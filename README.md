@@ -22,3 +22,12 @@ A browser-based, frame-by-frame animation tool inspired by Flipnote. It runs ent
 ### Compatibility
 
 Desktop only. Recommended for **Firefox** or **Chrome**. I am working on a mobile build at a later time.
+
+
+## Third-Party Libraries
+
+This project uses the following open-source libraries:
+
+- **[gifuct-js](https://github.com/matt-way/gifuct-js)** (v2.1.2) - GIF parsing and decompression
+  - Copyright (c) 2015 Matt Way
+  - Licensed under the [MIT License](https://github.com/matt-way/gifuct-js/blob/master/LICENSE)
