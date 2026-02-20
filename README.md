@@ -2,7 +2,7 @@
 <img width="1440" height="816" alt="Screenshot 2026-02-19 at 8 38 28 PM" src="https://github.com/user-attachments/assets/418d1706-91f2-4c68-a587-63d2cb4978c1" />
 
 # FlipLite
-*Just so you know, this project was helped by AI coding, rough estimate, 40% is coded by me and the rest is coded via various coding LLMs.*
+*Just so you know, this project was helped by AI coding, rough estimate, 45% is coded by me and the rest is coded via various coding LLMs.*
 
 A browser-based, frame-by-frame animation tool inspired by Flipnote. It runs entirely locally in your browser with no accounts, no cloud saving, and no setup.
 
