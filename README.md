@@ -1,5 +1,5 @@
 
-<img width="1440" height="816" alt="FlipLite v1.5.1w screenshot" src="https://github.com/user-attachments/assets/4f837d0e-b460-4913-ba7b-697ad5a825ce" />
+<img width="1440" height="816" alt="Screenshot 2026-02-19 at 8 38 28 PM" src="https://github.com/user-attachments/assets/418d1706-91f2-4c68-a587-63d2cb4978c1" />
 
 # FlipLite
 *Just so you know, this project was helped by AI coding, rough estimate, 40% is coded by me and the rest is coded via various coding LLMs.*
@@ -26,7 +26,7 @@ A browser-based, frame-by-frame animation tool inspired by Flipnote. It runs ent
 Desktop only. Recommended for **Firefox** or **Chrome**. I am working on a mobile build at a later time.
 
 
-## 📦 Third-Party Libraries
+## Third-Party Libraries
 
 This project uses the following open-source libraries:
 
