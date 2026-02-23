@@ -2060,6 +2060,9 @@ input[type="number"] {
   background: #2a2f37;
   box-shadow: 0 1px 0 #0008;
   margin: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
 #frames.compact-view .addTile:hover {
@@ -2068,9 +2071,13 @@ input[type="number"] {
 }
 
 #frames.compact-view .addTile>span:first-child {
-  font-size: 13px;
+  font-size: 16px !important;
   line-height: 1;
   color: #d7dde6;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 0;
 }
 
 
