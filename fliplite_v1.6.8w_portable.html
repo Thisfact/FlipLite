@@ -15078,18 +15078,50 @@
 
       function resizeProjectNoScale(nw, nh) {
         const ow = W, oh = H;
+        const shrinking = (nw < ow || nh < oh);
         frames.forEach(f => {
+          // If shrinking, stash full-res layer backups (merge with any existing backup)
+          if (shrinking) {
+            const backupLayers = f.layers.map(l => {
+              if (f._backup && f._backup.w >= l.can.width && f._backup.h >= l.can.height) {
+                const prev = f._backup.layers[f.layers.indexOf(l)];
+                if (prev) {
+                  const merged = makeCanvas(f._backup.w, f._backup.h);
+                  const mctx = merged.getContext('2d'); mctx.imageSmoothingEnabled = false;
+                  mctx.drawImage(prev, 0, 0);
+                  mctx.drawImage(l.can, 0, 0);
+                  return merged;
+                }
+              }
+              return cloneCanvas(l.can);
+            });
+            const bw = f._backup ? Math.max(f._backup.w, ow) : ow;
+            const bh = f._backup ? Math.max(f._backup.h, oh) : oh;
+            f._backup = { w: bw, h: bh, layers: backupLayers };
+          }
+
           const dx = Math.floor((nw - ow) / 2), dy = Math.floor((nh - oh) / 2);
           const sx = Math.max(0, -dx), sy = Math.max(0, -dy), sw = Math.min(ow - sx, nw), sh = Math.min(oh - sy, nh);
           const ddx = Math.max(0, dx), ddy = Math.max(0, dy);
 
-
-          f.layers.forEach(l => {
+          f.layers.forEach((l, li) => {
             const dst = makeCanvas(nw, nh), dctx = dst.getContext('2d'); dctx.imageSmoothingEnabled = false;
+            // If expanding and we have a backup with data beyond current size, restore it
+            if (!shrinking && f._backup && f._backup.layers[li]) {
+              const bk = f._backup.layers[li];
+              const bkdx = Math.floor((nw - f._backup.w) / 2);
+              const bkdy = Math.floor((nh - f._backup.h) / 2);
+              dctx.drawImage(bk, bkdx, bkdy);
+            }
+            // Draw current layer data on top (centered)
             if (sw > 0 && sh > 0) dctx.drawImage(l.can, sx, sy, sw, sh, ddx, ddy, sw, sh);
             l.can = dst; l.ctx = dctx;
           });
 
+          // If we expanded back to or beyond backup size, clear the backup
+          if (!shrinking && f._backup && nw >= f._backup.w && nh >= f._backup.h) {
+            delete f._backup;
+          }
 
           const bgDst = makeCanvas(nw, nh), bgCtx = bgDst.getContext('2d'); bgCtx.imageSmoothingEnabled = false;
 
@@ -15098,10 +15130,6 @@
             bgCtx.fillStyle = '#ffffff'; bgCtx.fillRect(0, 0, nw, nh);
             bgCtx.globalAlpha = 0.14; bgCtx.fillStyle = bgCtx.createPattern(checkerTile, 'repeat'); bgCtx.fillRect(0, 0, nw, nh); bgCtx.globalAlpha = 1;
           }
-
-
-
-
 
           if (sw > 0 && sh > 0) bgCtx.drawImage(f.bg.can, sx, sy, sw, sh, ddx, ddy, sw, sh);
           f.bg.can = bgDst; f.bg.ctx = bgCtx;
@@ -17980,8 +18008,8 @@
           return;
         }
 
-        if (e.key === 'ArrowLeft') { e.preventDefault(); setCurrent(Math.max(0, current - 1)); return; }
-        if (e.key === 'ArrowRight') { e.preventDefault(); setCurrent(Math.min(frames.length - 1, current + 1)); return; }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); setCurrent(current - 1 < 0 ? frames.length - 1 : current - 1); return; }
+        if (e.key === 'ArrowRight') { e.preventDefault(); setCurrent((current + 1) % frames.length); return; }
         if (e.key.toLowerCase() === 'b') { e.preventDefault(); setTool('brush'); return; }
         if (e.key.toLowerCase() === 'e') { e.preventDefault(); setTool('eraser'); return; }
         if (e.key.toLowerCase() === 'f') { e.preventDefault(); setTool('fill'); return; }
