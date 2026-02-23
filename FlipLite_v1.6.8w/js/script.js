@@ -2282,7 +2282,7 @@ const W = 500, H = 400;
     addTile.setAttribute("role", "button");
     addTile.tabIndex = 0;
     const addGlyph = document.createElement("span");
-    addGlyph.textContent = "➕";
+    addGlyph.innerHTML = '<svg width="44" height="44" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8.5" y="3" width="3" height="14" rx="1.5" fill="#4a4e54"/><rect x="3" y="8.5" width="14" height="3" rx="1.5" fill="#4a4e54"/></svg>';
     const addLabel = document.createElement("div");
     addLabel.textContent = "Add";
     addTile.append(addGlyph, addLabel);
