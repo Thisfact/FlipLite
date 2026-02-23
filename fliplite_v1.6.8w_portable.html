@@ -2475,6 +2475,9 @@
       background: #2a2f37;
       box-shadow: 0 1px 0 #0008;
       margin: 0;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
     }
 
     #frames.compact-view .addTile:hover {
@@ -2483,9 +2486,13 @@
     }
 
     #frames.compact-view .addTile>span:first-child {
-      font-size: 13px;
+      font-size: 16px !important;
       line-height: 1;
       color: #d7dde6;
+      width: 100%;
+      text-align: center;
+      margin: 0;
+      padding: 0;
     }
 
 
@@ -7924,15 +7931,14 @@
 
 
           const isCloseZoom = view.scale > 4;
-          const dashLen = isCloseZoom ? Math.max(1, 2 / view.scale) : 6 / view.scale;
-          const gapLen = isCloseZoom ? Math.max(0.5, 1.5 / view.scale) : 4 / view.scale;
-          const outlineWidth = isCloseZoom ? Math.max(0.2, 0.5 / view.scale) : 1 / view.scale;
+          const isZoomedOut = view.scale < 1;
+          const dashLen = isCloseZoom ? Math.max(1, 4 / view.scale) : (isZoomedOut ? 8 / view.scale : 6 / view.scale);
+          const gapLen = isCloseZoom ? Math.max(0.5, 4 / view.scale) : (isZoomedOut ? 8 / view.scale : 6 / view.scale);
+          const outlineWidth = isCloseZoom ? Math.max(0.2, 1 / view.scale) : (isZoomedOut ? 2 / view.scale : 1 / view.scale);
           ctx.lineWidth = outlineWidth;
 
 
-
           if (sel.poly && sel.poly.length) {
-
 
             let scaleX = 1, scaleY = 1;
             if (selTransform.mode === 'scale' && selTransform.startW && selTransform.startH) {
@@ -7942,7 +7948,6 @@
 
             const baseX = (selTransform.mode === 'rotate') ? selTransform.startSelX : sel.x;
             const baseY = (selTransform.mode === 'rotate') ? selTransform.startSelY : sel.y;
-
 
             function drawPolyPath() {
               ctx.beginPath();
@@ -7955,15 +7960,28 @@
               ctx.closePath();
             }
 
-
-            ctx.setLineDash([dashLen, gapLen]);
-            ctx.strokeStyle = '#3aa3ff';
+            // White base
+            ctx.setLineDash([]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
             drawPolyPath();
             ctx.stroke();
+
+            // Blue dash
+            ctx.setLineDash([dashLen, gapLen]);
+            ctx.strokeStyle = '#1e90ff';
+            drawPolyPath();
+            ctx.stroke();
+
           } else if (!sel.img) {
 
+            // White base
+            ctx.setLineDash([]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+            ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
+
+            // Blue dash
             ctx.setLineDash([dashLen, gapLen]);
-            ctx.strokeStyle = '#3aa3ff';
+            ctx.strokeStyle = '#1e90ff';
             ctx.strokeRect(sel.x, sel.y, sel.w, sel.h);
           }
 
@@ -8044,10 +8062,11 @@
 
 
             if (cr.w > 1 && cr.h > 1) {
-              const cropHs = Math.min(12, Math.max(8, 10 / view.scale)) / view.scale;
+              const cropVisualSize = view.scale > 4 ? 18 : Math.min(12, Math.max(8, 10 / view.scale));
+              const cropHs = cropVisualSize / view.scale;
               ctx.fillStyle = '#ff6b4a';
               ctx.strokeStyle = '#fff';
-              ctx.lineWidth = 2 / view.scale;
+              ctx.lineWidth = view.scale > 4 ? 3 / view.scale : 2 / view.scale;
               const cropCorners = [
                 [cropCanvasX, cropCanvasY],
                 [cropCanvasX + cropCanvasW, cropCanvasY],
@@ -8089,15 +8108,15 @@
 
 
           if (!importPreview.cropping) {
-            const maxHandleSize = 14;
+            const maxHandleSize = 20;
             const minHandleSize = 10;
-            const visualSize = Math.min(maxHandleSize, Math.max(minHandleSize, 12 / view.scale));
+            const visualSize = view.scale > 4 ? 20 : Math.min(maxHandleSize, Math.max(minHandleSize, 12 / view.scale));
             const hs = visualSize / view.scale;
 
             ctx.setLineDash([]);
             ctx.fillStyle = '#4cb2ff';
             ctx.strokeStyle = '#1a1b1e';
-            ctx.lineWidth = 3 / view.scale;
+            ctx.lineWidth = view.scale > 4 ? 4 / view.scale : 3 / view.scale;
             const corners = [
               [importPreview.x, importPreview.y],
               [importPreview.x + importPreview.w, importPreview.y],
@@ -8344,6 +8363,7 @@
         }
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
       }
 
       let renderRAF = 0;
@@ -11109,8 +11129,8 @@
           if (sel.state === 'move') {
             if (!sel.hasCut && sel.img) ensureSelectionFloating();
 
-            sel.x = p.x - sel.dragDX;
-            sel.y = p.y - sel.dragDY;
+            sel.x = Math.round(p.x - sel.dragDX);
+            sel.y = Math.round(p.y - sel.dragDY);
             requestRender();
             return;
           }
@@ -12594,8 +12614,8 @@
 
 
         sel.img = dst;
-        sel.x = selTransform.startCX - newW / 2;
-        sel.y = selTransform.startCY - newH / 2;
+        sel.x = Math.round(selTransform.startCX - newW / 2);
+        sel.y = Math.round(selTransform.startCY - newH / 2);
         sel.w = newW;
         sel.h = newH;
 
@@ -12682,9 +12702,9 @@
 
         const z = view.scale;
 
-        const maxHandleSize = 18;
+        const maxHandleSize = 24;
         const minHandleSize = 18;
-        const visualSize = Math.min(maxHandleSize, Math.max(minHandleSize, 14 / z));
+        const visualSize = z > 4 ? 24 : 18;
         const HANDLE_SIZE = visualSize / z;
 
         const ROT_DIST = 20 / z;
@@ -12782,44 +12802,77 @@
 
 
         const isCloseZoom = z > 4;
-        const dashLen = isCloseZoom ? Math.max(1, 2 / z) : 6 / z;
-        const gapLen = isCloseZoom ? Math.max(0.5, 1.5 / z) : 4 / z;
+        const isZoomedOut = z < 1;
+        const dashLen = isCloseZoom ? Math.max(1, 4 / z) : (isZoomedOut ? 8 / z : 6 / z);
+        const gapLen = isCloseZoom ? Math.max(0.5, 4 / z) : (isZoomedOut ? 8 / z : 6 / z);
+        const outlineWidth = isCloseZoom ? Math.max(0.2, 1 / z) : (isZoomedOut ? 2 / z : 1 / z);
 
-        const outlineWidth = isCloseZoom ? Math.max(0.2, 0.5 / z) : 1 / z;
-        ctx.lineWidth = outlineWidth;
 
-
-        ctx.setLineDash([dashLen, gapLen]);
-        ctx.strokeStyle = '#3aa3ff';
+        // Draw high-contrast two-tone selection bound
         if (!sel.poly) {
+          ctx.lineWidth = outlineWidth;
+          // White solid base
+          ctx.setLineDash([]);
+          ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+          ctx.strokeRect(bx, by, bw, bh);
+          // Blue dashed top
+          ctx.setLineDash([dashLen, gapLen]);
+          ctx.strokeStyle = '#1e90ff';
           ctx.strokeRect(bx, by, bw, bh);
         }
 
 
         ctx.setLineDash([]);
+        ctx.lineWidth = outlineWidth;
         if (!selTransform.mode || selTransform.mode === 'rotate') {
           ctx.beginPath();
           ctx.moveTo(cx, by);
-          ctx.lineTo(cx, rotHandle.y + rotHandle.h);
+          ctx.lineTo(cx, rotHandle.y + rotHandle.h / 2); // extend exactly to handle center
+          ctx.strokeStyle = 'rgba(255,255,255,0.8)';
           ctx.stroke();
         }
 
 
-        ctx.fillStyle = '#fff';
-        ctx.strokeStyle = '#3aa3ff';
-        ctx.lineWidth = 2.5 / z;
+        // Function to draw beautiful circular handles
+        const drawHandle = (hx, hy, radius, isRot = false) => {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(hx, hy, radius, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+
+          // subtle drop shadow for depth
+          ctx.shadowColor = 'rgba(0,0,0,0.3)';
+          ctx.shadowBlur = 4 / z;
+          ctx.shadowOffsetY = 2 / z;
+          ctx.fill();
+
+          // clear shadow for stroke
+          ctx.shadowColor = 'transparent';
+          ctx.lineWidth = isZoomedOut ? 3 / z : (z > 4 ? 4 / z : 3 / z);
+          ctx.strokeStyle = isRot ? '#4cb2ff' : '#1e90ff';
+          ctx.stroke();
+
+          // Inner dot for rotation handle
+          if (isRot) {
+            ctx.beginPath();
+            ctx.arc(hx, hy, radius * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = '#1e90ff';
+            ctx.fill();
+          }
+          ctx.restore();
+        };
+
+
+        const handleRadius = hs * 0.5;
+
+        // Draw Corners
         Object.values(corners).forEach(c => {
-          ctx.fillRect(c.x, c.y, c.w, c.h);
-          ctx.strokeRect(c.x, c.y, c.w, c.h);
+          drawHandle(c.x + c.w / 2, c.y + c.h / 2, handleRadius);
         });
 
-
+        // Draw Rotation Handling
         if (!selTransform.mode || selTransform.mode === 'rotate') {
-          const rotRadius = hs * 0.65 + 2 / z;
-          ctx.beginPath();
-          ctx.arc(rotHandle.x + hs / 2, rotHandle.y + hs / 2, rotRadius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
+          drawHandle(rotHandle.x + rotHandle.w / 2, rotHandle.y + rotHandle.h / 2, handleRadius * 1.2, true);
         }
 
         ctx.restore();
@@ -19670,7 +19723,7 @@
 
       function getImportResizeHandle(px, py) {
         if (!importPreview) return null;
-        const hs = 16 / view.scale;
+        const hs = (view.scale > 4 ? 24 : Math.max(16, 16 / view.scale)) / view.scale;
         const corners = {
           'nw': [importPreview.x, importPreview.y],
           'ne': [importPreview.x + importPreview.w, importPreview.y],
@@ -19795,7 +19848,7 @@
         }
 
         const cr = importPreview.cropRect;
-        const handleSize = 12 * scaleX;
+        const handleSize = (view.scale > 4 ? 24 : 16) * scaleX;
 
 
         if (cr && cr.w > 1 && cr.h > 1) {
